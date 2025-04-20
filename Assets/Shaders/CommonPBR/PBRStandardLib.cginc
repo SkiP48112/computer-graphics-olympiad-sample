@@ -48,4 +48,10 @@ float3 FresnelSchlick(float cosTheta, float3 surfaceReflectivity)
     return surfaceReflectivity + (1.0 - surfaceReflectivity) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
+
+float3 FresnelSchlickRoughness(float cosTheta, float3 surfaceReflectivity, float roughness)
+{
+    return surfaceReflectivity + (max(float3(1.0 - roughness, 1.0 - roughness, 1.0 - roughness), surfaceReflectivity) - surfaceReflectivity) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
 #endif

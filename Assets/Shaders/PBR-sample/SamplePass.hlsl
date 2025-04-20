@@ -22,6 +22,46 @@ CBUFFER_START(UnityPerMaterial)
 	float _MetallicFactor;
 CBUFFER_END
 
+
+float3 CalculateDirectLight(float3 albedo, float metallic, float roughness, float3 viewDirection, float3 normal, float3 surfaceReflectivity)
+{
+	Light light = GetMainLight();
+	float3 lightDirection = light.direction;
+	float3 lightColor = light.color * light.distanceAttenuation;
+
+	float3 halfwayVector = normalize(viewDirection + lightDirection);
+
+	float NDF = DistributionGGX(normal, halfwayVector, roughness);
+	float geometry = GeometrySmith(normal, viewDirection, lightDirection, roughness);
+	float3 fresnel = FresnelSchlick(max(dot(halfwayVector, viewDirection), 0.0), surfaceReflectivity);
+
+	float3 kD = (1.0 - fresnel) * (1.0 - metallic);
+	float3 diffuse = kD * albedo / PI;
+	float3 specular = NDF * geometry * fresnel / max(4.0 * max(dot(normal, viewDirection), 0.0) * max(dot(normal, lightDirection), 0.0),  MIN_DENOMINATOR);
+	
+	float NdotL = max(dot(normal, lightDirection), 0.0);
+	
+	return (diffuse + specular) * lightColor * NdotL;
+}
+
+float3 CalculateAmbient(float3 albedo, float3 normal, float3 viewDirection, float roughness, float metallic, float3 surfaceReflectivity)
+{
+	float3 ambientDiffuse = SampleSH(normal) * albedo;
+
+	float3 reflection = reflect(-viewDirection, normal);
+	float mipLevel = roughness * (1.7 - 0.7 * roughness) * UNITY_SPECCUBE_LOD_STEPS;
+	
+	float4 specularSample = SAMPLE_TEXTURECUBE_LOD(unity_SpecCube0, samplerunity_SpecCube0, reflection, mipLevel);
+	float3 ambientSpecular = DecodeHDREnvironment(specularSample, unity_SpecCube0_HDR);
+
+	float3 fresnel = FresnelSchlickRoughness(max(dot(normal, viewDirection), 0.0), surfaceReflectivity, roughness);
+	ambientSpecular *= fresnel;
+
+	float3 kD = (1.0 - fresnel) * (1.0 - metallic);
+	
+	return kD * ambientDiffuse + ambientSpecular;
+}
+
 VertexOutput Vertex(VertexInput input)
 {
 	VertexOutput output;
@@ -48,29 +88,14 @@ half4 Fragment(VertexOutput input) : SV_Target
 	float3 normalWS = normalize(mul(normalTS, TBN));
 
 	float3 albedo = diffuseTex.rgb * _BaseColor.rgb;
+	float3 viewDirection = GetWorldSpaceViewDir(input.positionWS);
 	float3 surfaceReflectivity = lerp(DEFAULT_SURFACE_REFLECTIVITY, albedo, metallic);
 
-	Light light = GetMainLight();
-	float3 lightDirection = light.direction;
-	float3 lightColor = light.color * light.distanceAttenuation;
-
-	float3 viewDirection = GetWorldSpaceViewDir(input.positionWS);
-	float3 halfwayVector = normalize(viewDirection + lightDirection);
-
-	float NDF = DistributionGGX(normalWS, halfwayVector, roughness);
-	float geometry = GeometrySmith(normalWS, viewDirection, lightDirection, roughness);
-	float3 fresnel = FresnelSchlick(max(dot(halfwayVector, viewDirection), 0.0), surfaceReflectivity);
-
-	float3 kD = (1.0 - fresnel) * (1.0 - metallic);
-	float3 diffuse = kD * albedo / PI;
-	float3 specular = NDF * geometry * fresnel / max(4.0 * max(dot(normalWS, viewDirection), 0.0) * max(dot(normalWS, lightDirection), 0.0),  MIN_DENOMINATOR);
+	float3 directLight = CalculateDirectLight(albedo, metallic, roughness, viewDirection, normalWS, surfaceReflectivity);
+	float3 ambient = CalculateAmbient(albedo, normalWS, viewDirection, roughness, metallic, surfaceReflectivity);
+	//float3 ambient = float3(0.03, 0.03, 0.03) * albedo;
 	
-	float NdotL = max(dot(normalWS, lightDirection), 0.0);
-	
-	float3 directLight = (diffuse + specular) * lightColor * NdotL;
-	float3 simpleAmbient = float3(0.03, 0.03, 0.03) * albedo;
-	
-	return float4(directLight + simpleAmbient, 1.0);
+	return float4(directLight + ambient, 1.0);
 }
 
 #endif
