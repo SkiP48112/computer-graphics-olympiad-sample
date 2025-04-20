@@ -93,7 +93,6 @@ half4 Fragment(VertexOutput input) : SV_Target
 
 	float3 directLight = CalculateDirectLight(albedo, metallic, roughness, viewDirection, normalWS, surfaceReflectivity);
 	float3 ambient = CalculateAmbient(albedo, normalWS, viewDirection, roughness, metallic, surfaceReflectivity);
-	//float3 ambient = float3(0.03, 0.03, 0.03) * albedo;
 	
 	return float4(directLight + ambient, 1.0);
 }
