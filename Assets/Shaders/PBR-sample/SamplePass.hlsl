@@ -80,8 +80,8 @@ VertexOutput Vertex(VertexInput input)
 half4 Fragment(VertexOutput input) : SV_Target
 {
 	float4 diffuseTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
-	float roughness = SAMPLE_TEXTURE2D(_RoughnessMap, sampler_RoughnessMap, input.uv) * _RoughnessFactor;
-	float metallic = SAMPLE_TEXTURE2D(_MetallicMap, sampler_MetallicMap, input.uv) * _MetallicFactor;
+	float roughness = SAMPLE_TEXTURE2D(_RoughnessMap, sampler_RoughnessMap, input.uv).r * _RoughnessFactor;
+	float metallic = SAMPLE_TEXTURE2D(_MetallicMap, sampler_MetallicMap, input.uv).r * _MetallicFactor;
 	float3 normalTS = UnpackNormal(SAMPLE_TEXTURE2D(_NormalMap, sampler_NormalMap, input.uv));
 
 	float3x3 TBN = float3x3(input.tangentWS, input.bitangentWS, input.normalWS);
