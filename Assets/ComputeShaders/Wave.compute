@@ -1,0 +1,55 @@
+#pragma kernel WaveUpdate
+
+struct WaveData
+{
+    float3 position;
+    float startTime;
+    float strength;
+    float radius;
+};
+
+StructuredBuffer<WaveData> _Waves;
+StructuredBuffer<float3> _OriginalVertices;
+RWStructuredBuffer<float3> _Vertices;
+
+int _WaveCount;
+float _Time;
+float _DeltaTime;
+float _WaveSpeed;
+float _Damping;
+float _WaveFrequency;
+float4x4 _ObjectToWorld;
+
+
+[numthreads(64, 1, 1)]
+void WaveUpdate(uint3 id : SV_DispatchThreadID)
+{
+    uint index = id.x;
+    if(index >= _Vertices.Length)
+    {
+        return;
+    }
+
+    float3 originalVertex = _OriginalVertices[index];
+    float3 originalVertexWS = mul(_ObjectToWorld, float4(originalVertex, 1.0)).xyz;
+
+    float offset = 0;
+    for(int i = 0; i < _WaveCount; i++)
+    {
+        WaveData currentWave = _Waves[i];
+        float2 positionDelta = originalVertexWS.xz - currentWave.position.xz;
+        float dist = length(positionDelta);
+
+        if(dist <= currentWave.radius)
+        {
+            float time = _Time - currentWave.startTime;
+            float attenuation = saturate(1.0 - dist / currentWave.radius);
+            float waveValue = sin(dist * _WaveFrequency - time * _WaveSpeed);
+            float damping = exp(-_Damping * time);
+            offset += waveValue * attenuation * damping * currentWave.strength;
+        }
+    }
+
+    originalVertex.y += offset;
+    _Vertices[index] = originalVertex;
+}
