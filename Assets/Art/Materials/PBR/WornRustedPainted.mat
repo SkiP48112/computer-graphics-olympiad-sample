@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: PittedRustedMetal
+  m_Name: WornRustedPainted
   m_Shader: {fileID: 4800000, guid: 7eb7569ffb7e5dc4385063fc02eaa01c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -48,7 +48,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: e121877a98da2b648a02e75cc2060748, type: 3}
+        m_Texture: {fileID: 2800000, guid: 4b1947df39b84784fb82c1a4f3988cc5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -56,11 +56,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicMap:
-        m_Texture: {fileID: 2800000, guid: fd7fc97fec3afda4d8976de142b3c78d, type: 3}
+        m_Texture: {fileID: 2800000, guid: cb5a52f5574b20948a374b04ffd4be21, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 2800000, guid: 585a5348c20ea6b4cb4746a853a87b53, type: 3}
+        m_Texture: {fileID: 2800000, guid: ed4d8759585e0c94eb827085ca9e588f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -72,7 +72,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RoughnessMap:
-        m_Texture: {fileID: 2800000, guid: 3500a68e21e69744e840e354e05d1274, type: 3}
+        m_Texture: {fileID: 2800000, guid: 55a9ec5b82261d748b982024d1c4c725, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
@@ -111,7 +111,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
-    - _MetallicFactor: 1
+    - _MetallicFactor: 0.5
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
