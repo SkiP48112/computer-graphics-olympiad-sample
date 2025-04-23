@@ -17,14 +17,15 @@ namespace ComputeShaders
         private const string WAVES_BUFFER_NAME = "_Waves";
         private const string VERTICES_BUFFER_NAME = "_Vertices";
         private const string ORIGINAL_VERTICES_BUFFER_NAME = "_OriginalVertices";
-        private const string WAVE_FREQUENCY_PARAM_NAME = "_WaveFrequency";
-        private const string WAVE_SPEED_PARAM_NAME = "_WaveSpeed";
-        private const string DAMPING_PARAM_NAME = "_Damping";
         
-        private const string OBJECT_TO_WORLD_MATRIX_NAME = "_ObjectToWorld";
-        private const string WAVE_COUNT_PARAM_NAME = "_WaveCount";
-        private const string DELTA_TIME_PARAM_NAME = "_DeltaTime";
-        private const string TIME_PARAM_NAME = "_Time";
+        private readonly int OBJECT_TO_WORLD_MATRIX_PARAM = Shader.PropertyToID("_ObjectToWorld");
+
+        private readonly int WAVE_FREQUENCY_PROP = Shader.PropertyToID("_WaveFrequency");
+        private readonly int WAVE_COUNT_PROP = Shader.PropertyToID("_WaveCount");
+        private readonly int DELTA_TIME_PROP = Shader.PropertyToID("_DeltaTime");
+        private readonly int WAVE_SPEED_PROP = Shader.PropertyToID("_WaveSpeed");
+        private readonly int DAMPING_PROP= Shader.PropertyToID("_Damping");
+        private readonly int TIME_PROP = Shader.PropertyToID("_Time");
 
         [SerializeField] private ComputeShader _waveComputeShader;
         [SerializeField] [Range(0.0f, 60.0f)] private float _waveLifetimeSec = 10.0f;
@@ -96,9 +97,9 @@ namespace ComputeShaders
             _waveComputeShader.SetBuffer(_kernelIndex, WAVES_BUFFER_NAME, _wavesBuffer);
             _waveComputeShader.SetBuffer(_kernelIndex, VERTICES_BUFFER_NAME, _verticesBuffer);
             _waveComputeShader.SetBuffer(_kernelIndex, ORIGINAL_VERTICES_BUFFER_NAME, _originalVerticesBuffer);
-            _waveComputeShader.SetFloat(WAVE_FREQUENCY_PARAM_NAME, _waveFrequency);
-            _waveComputeShader.SetFloat(WAVE_SPEED_PARAM_NAME, _waveSpeed);
-            _waveComputeShader.SetFloat(DAMPING_PARAM_NAME, _damping);
+            _waveComputeShader.SetFloat(WAVE_FREQUENCY_PROP, _waveFrequency);
+            _waveComputeShader.SetFloat(WAVE_SPEED_PROP, _waveSpeed);
+            _waveComputeShader.SetFloat(DAMPING_PROP, _damping);
         }
 
         private void HandleInput()
@@ -140,7 +141,7 @@ namespace ComputeShaders
 
         private void DispatchComputeShader()
         {
-            _waveComputeShader.SetMatrix(OBJECT_TO_WORLD_MATRIX_NAME, transform.localToWorldMatrix);
+            _waveComputeShader.SetMatrix(OBJECT_TO_WORLD_MATRIX_PARAM, transform.localToWorldMatrix);
 
             var wavesInPoolCount = Mathf.Min(_activeWaves.Count, MAX_WAVE_COUNT);
             for (var i = 0; i < wavesInPoolCount; i++)
@@ -149,9 +150,9 @@ namespace ComputeShaders
             }
             
             _wavesBuffer.SetData(_wavePool);
-            _waveComputeShader.SetInt(WAVE_COUNT_PARAM_NAME, wavesInPoolCount);
-            _waveComputeShader.SetFloat(DELTA_TIME_PARAM_NAME, Time.deltaTime);
-            _waveComputeShader.SetFloat(TIME_PARAM_NAME, Time.time);
+            _waveComputeShader.SetInt(WAVE_COUNT_PROP, wavesInPoolCount);
+            _waveComputeShader.SetFloat(DELTA_TIME_PROP, Time.deltaTime);
+            _waveComputeShader.SetFloat(TIME_PROP, Time.time);
 
             var threadGroups = Mathf.CeilToInt(_mesh.vertexCount / NUM_THREADS_X);
             _waveComputeShader.Dispatch(_kernelIndex, threadGroups, NUM_THREADS_Y, NUM_THREADS_Z);
@@ -169,7 +170,6 @@ namespace ComputeShaders
                 _meshCollider.sharedMesh = _mesh;
             }
         }
-        
     }
 
     internal struct WaveData
