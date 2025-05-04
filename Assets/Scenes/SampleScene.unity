@@ -2090,7 +2090,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2075880615}
   m_Layer: 0
-  m_Name: '--- Don''t Forget To Enable Cel Shading --- '
+  m_Name: '--- Don''t Forget To Enable Cel Shading And Outline --- '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

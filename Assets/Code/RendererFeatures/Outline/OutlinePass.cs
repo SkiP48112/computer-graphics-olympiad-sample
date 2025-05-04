@@ -2,19 +2,21 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace Code.RendererFeatures.CelShading
+namespace Code.RendererFeatures.Outline
 {
-    public class CelShadingPass : ScriptableRenderPass
+    public class OutlinePass : ScriptableRenderPass
     {
-        private readonly int COLOR_LEVELS_PROP = Shader.PropertyToID("_ColorLevels");
-        private const string CEL_SHADING_BUFFER_NAME = "Cel Shading Pass";
+        private readonly int OUTLINE_THICKNESS_PROP = Shader.PropertyToID("_OutlineThickness");
+        private readonly int DEPTH_THRESHOLD_PROP = Shader.PropertyToID("_DepthThreshold");
+        private readonly int OUTLINE_COLOR_PROP = Shader.PropertyToID("_OutlineColor");
+        private const string OUTLINE_BUFFER_NAME = "Outline Pass";
 
-        private readonly CelShadingSettings _settings;
+        private readonly OutlineSettings _settings;
         
         private RenderTargetIdentifier _source;
         private RenderTargetHandle _tempTexture;
 
-        public CelShadingPass(CelShadingSettings settings)
+        public OutlinePass(OutlineSettings settings)
         {
             _settings = settings;
         }
@@ -36,9 +38,11 @@ namespace Code.RendererFeatures.CelShading
                 return;
             }
             
-            var cmd = CommandBufferPool.Get(CEL_SHADING_BUFFER_NAME);
+            var cmd = CommandBufferPool.Get(OUTLINE_BUFFER_NAME);
             
-            _settings.Material.SetInt(COLOR_LEVELS_PROP, _settings.ColorLevels);
+            _settings.Material.SetFloat(OUTLINE_THICKNESS_PROP, _settings.OutlineThickness);
+            _settings.Material.SetFloat(DEPTH_THRESHOLD_PROP, _settings.DepthThreshold);
+            _settings.Material.SetColor(OUTLINE_COLOR_PROP, _settings.OutlineColor);
 
             Blit(cmd, _source, _tempTexture.Identifier(), _settings.Material);
             Blit(cmd, _tempTexture.Identifier(), _source);
