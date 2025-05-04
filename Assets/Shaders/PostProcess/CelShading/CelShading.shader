@@ -3,15 +3,11 @@ Shader "PostProcess/CelShading"
 	Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _ColorLevels ("Color Levels", Int) = 3
-        _OutlineThickness ("Outline Thickness", Float) = 1
-        _DepthThreshold ("Depth Threshold", Float) = 0.01
-        _OutlineColor ("Outline Color", Color) = (0,0,0,1)
+        _ColorLevels ("Color Levels", Int) = 8
     }
 
 	HLSLINCLUDE
 		#pragma exclude_renderers gles
-
 		#include "CelShadingPass.hlsl"
 	ENDHLSL
 

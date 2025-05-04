@@ -1,19 +1,19 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace Code.RendererFeatures.CelShading
+namespace Code.RendererFeatures.Outline
 {
-    public class CelShadingFeature : ScriptableRendererFeature
+    public class OutlineRendererFeature : ScriptableRendererFeature
     {
-        [SerializeField] private CelShadingSettings _settings;
+        [SerializeField] private OutlineSettings _settings;
         
-        private CelShadingPass _pass;
+        private OutlinePass _pass;
 
         public override void Create()
         {
-            _pass = new CelShadingPass(_settings)
+            _pass = new OutlinePass(_settings)
             {
-                renderPassEvent = RenderPassEvent.AfterRenderingOpaques
+                renderPassEvent = RenderPassEvent.AfterRenderingTransparents
             };
         }
 
@@ -28,7 +28,7 @@ namespace Code.RendererFeatures.CelShading
         {
             if (_settings.Material == null)
             {
-                Debug.LogWarning("Cell Shading material not set!");
+                Debug.LogWarning("Outline material not set!");
                 return;
             }
         
